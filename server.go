@@ -8,11 +8,10 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"text/template"
 )
 
 var port *int = flag.Int("p", 23456, "Port to listen.")
-var user *string = flag.String("user", "", "Github username.")
-var pass *string = flag.String("pass", "", "Github password.")
 
 var dispatch map[int64]chan int = make(map[int64]chan int)
 
@@ -79,13 +78,19 @@ func HookListener(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w, "Socket %s contacted", socket)
 }
 
+func MainPage(w http.ResponseWriter, req *http.Request) {
+		t, _ := template.ParseFiles("index.html")
+		t.Execute(w, nil)
+}
+
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	flag.Parse()
 
 	http.Handle("/hub", websocket.Handler(hubServer))
-	http.Handle("/", http.FileServer(http.Dir("")))
+	http.Handle("/static", http.FileServer(http.Dir("static")))
+	http.HandleFunc("/", MainPage)
 	http.HandleFunc("/incoming", HookListener)
 
 	fmt.Printf(" * http://localhost:%d/\n", *port)
@@ -93,6 +98,6 @@ func main() {
 	err := http.ListenAndServe(fmt.Sprintf(":%d", *port), nil)
 
 	if err != nil {
-		panic("ListenANdServe: " + err.Error())
+		panic("ListenAndServe: " + err.Error())
 	}
 }
