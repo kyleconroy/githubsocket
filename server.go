@@ -86,7 +86,7 @@ func main() {
 		http.HandleFunc("/incoming", HookListener)
 		http.Handle("/", http.FileServer(http.Dir("")))
 
-		fmt.Printf("http://localhost:%d/\n", *port)
+		fmt.Printf(" * http://localhost:%d/\n", *port)
 		err := http.ListenAndServe(fmt.Sprintf(":%d", *port), nil)
 		if err != nil {
 				panic("ListenANdServe: " + err.Error())
