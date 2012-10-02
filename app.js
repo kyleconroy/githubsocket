@@ -1,0 +1,39 @@
+var path;
+var ws;
+
+function init() {
+  console.log("init");
+
+  if (ws != null) {
+    ws.close();
+    ws = null;
+  }
+
+  ws = new WebSocket("ws://localhost:23456/hub")
+
+  ws.onopen = function () {
+    console.log("opened hooks");
+    send()
+  };
+
+  ws.onmessage = function (e) {
+    console.log(e.data);
+  };
+
+  ws.onclose = function (e) {
+    console.log("closed hooks");
+  };
+  
+};
+
+function send() {
+  m = JSON.stringify({
+    mode: "subscribe",
+    topic: "https://github.com/twitter/bootstrap/events/push"
+  })
+
+  console.log("send:" + m);
+
+  ws.send(m);
+};
+
